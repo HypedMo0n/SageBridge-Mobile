@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SageBridge - Your Sage 50, Everywhere</title>
+    <meta name="description" content="Access your Sage 50 Canada data from anywhere, on any device">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        [data-theme="dark"] {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            padding-bottom: 80px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
+
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .sync-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        /* Dashboard Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-change {
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .stat-change.positive { color: var(--success); }
+        .stat-change.negative { color: var(--danger); }
+
+        /* Section */
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .view-all {
+            color: var(--primary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .card-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge.danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        [data-theme="dark"] .badge.success {
+            background: #064e3b;
+            color: #6ee7b7;
+        }
+
+        [data-theme="dark"] .badge.warning {
+            background: #78350f;
+            color: #fcd34d;
+        }
+
+        [data-theme="dark"] .badge.danger {
+            background: #7f1d1d;
+            color: #fca5a5;
+        }
+
+        /* Amount */
+        .amount {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .amount.positive { color: var(--success); }
+        .amount.negative { color: var(--danger); }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            box-shadow: 0 -4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.75rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Error */
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+
+        [data-theme="dark"] .error-message {
+            background: #7f1d1d;
+            color: #fca5a5;
+        }
+
+        /* Utility */
+        .hidden { display: none !important; }
+        
+        @media (max-width: 640px) {
+            .container { padding: 1rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .stat-value { font-size: 1.75rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">S</div>
+                <span>SageBridge</span>
+            </div>
+            <div class="sync-status">
+                <div class="sync-dot"></div>
+                <span id="syncStatus">Synced</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Dashboard Stats -->
+        <div id="dashboardSection" class="stats-grid">
+            <!-- Stats will be injected here -->
+        </div>
+
+        <!-- Customers Section -->
+        <section id="customersSection" class="section hidden">
+            <div class="section-header">
+                <h2 class="section-title">Customers</h2>
+                <a class="view-all" onclick="showSection('dashboard')">← Back</a>
+            </div>
+            <div id="customersList" class="card-grid">
+                <!-- Customers will be injected here -->
+            </div>
+        </section>
+
+        <!-- Invoices Section -->
+        <section id="invoicesSection" class="section hidden">
+            <div class="section-header">
+                <h2 class="section-title">Invoices</h2>
+                <a class="view-all" onclick="showSection('dashboard')">← Back</a>
+            </div>
+            <div id="invoicesList" class="card-grid">
+                <!-- Invoices will be injected here -->
+            </div>
+        </section>
+
+        <!-- Products Section -->
+        <section id="productsSection" class="section hidden">
+            <div class="section-header">
+                <h2 class="section-title">Products & Services</h2>
+                <a class="view-all" onclick="showSection('dashboard')">← Back</a>
+            </div>
+            <div id="productsList" class="card-grid">
+                <!-- Products will be injected here -->
+            </div>
+        </section>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading hidden">
+            <div class="spinner"></div>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="hidden">
+            <div class="error-message">
+                <strong>Connection Error:</strong>
+                <span id="errorMessage"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a class="nav-item active" onclick="showSection('dashboard')" data-section="dashboard">
+            <div class="nav-icon">📊</div>
+            <span>Overview</span>
+        </a>
+        <a class="nav-item" onclick="showSection('customers')" data-section="customers">
+            <div class="nav-icon">👥</div>
+            <span>Customers</span>
+        </a>
+        <a class="nav-item" onclick="showSection('invoices')" data-section="invoices">
+            <div class="nav-icon">📄</div>
+            <span>Invoices</span>
+        </a>
+        <a class="nav-item" onclick="showSection('products')" data-section="products">
+            <div class="nav-icon">📦</div>
+            <span>Products</span>
+        </a>
+    </nav>
+
+    <script>
+        // Configuration
+        const API_URL = 'https://sagebridge-api.cheikhmounirk.workers.dev';
+        const API_KEY = 'universl_main_sage50bridge2026';
+
+        // State
+        let currentSection = 'dashboard';
+        let data = {
+            customers: [],
+            invoices: [],
+            products: []
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            setInterval(loadData, 30000); // Refresh every 30 seconds
+        });
+
+        // Load data from API
+        async function loadData() {
+            try {
+                showLoading(true);
+                hideError();
+
+                const [customers, invoices, products] = await Promise.all([
+                    fetch(`${API_URL}/api/customers`, {
+                        headers: { 'X-API-Key': API_KEY }
+                    }).then(r => r.json()),
+                    fetch(`${API_URL}/api/invoices`, {
+                        headers: { 'X-API-Key': API_KEY }
+                    }).then(r => r.json()),
+                    fetch(`${API_URL}/api/products`, {
+                        headers: { 'X-API-Key': API_KEY }
+                    }).then(r => r.json())
+                ]);
+
+                data.customers = customers.customers || [];
+                data.invoices = invoices.invoices || [];
+                data.products = products.all || products.products || [];
+
+                renderDashboard();
+                renderCustomers();
+                renderInvoices();
+                renderProducts();
+
+                document.getElementById('syncStatus').textContent = 'Synced just now';
+                showLoading(false);
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showError(error.message);
+                showLoading(false);
+            }
+        }
+
+        // Render Dashboard
+        function renderDashboard() {
+            const totalReceivables = data.customers.reduce((sum, c) => sum + (c.balance || 0), 0);
+            const totalInvoiced = data.invoices.reduce((sum, i) => sum + (i.total || 0), 0);
+            const unpaidInvoices = data.invoices.filter(i => i.status === 'Unpaid').length;
+
+            document.getElementById('dashboardSection').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-label">Total Receivables</div>
+                    <div class="stat-value">$${formatMoney(totalReceivables)}</div>
+                    <div class="stat-change positive">
+                        ↑ ${data.customers.length} customers
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Invoiced</div>
+                    <div class="stat-value">$${formatMoney(totalInvoiced)}</div>
+                    <div class="stat-change">
+                        ${data.invoices.length} invoices
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Unpaid Invoices</div>
+                    <div class="stat-value">${unpaidInvoices}</div>
+                    <div class="stat-change ${unpaidInvoices > 0 ? 'negative' : 'positive'}">
+                        ${unpaidInvoices > 0 ? 'Needs attention' : 'All paid'}
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Products</div>
+                    <div class="stat-value">${data.products.length}</div>
+                    <div class="stat-change">
+                        In catalog
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render Customers
+        function renderCustomers() {
+            const html = data.customers.map(customer => `
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">${customer.name}</div>
+                            <div class="card-subtitle">${customer.email || 'No email'}</div>
+                        </div>
+                        <span class="badge ${customer.status === 'Active' ? 'success' : 'warning'}">
+                            ${customer.status}
+                        </span>
+                    </div>
+                    <div class="card-meta">
+                        <span>📞 ${customer.phone || 'No phone'}</span>
+                    </div>
+                    <div style="margin-top: 0.75rem;">
+                        <div class="amount ${customer.balance > 0 ? 'negative' : 'positive'}">
+                            $${formatMoney(customer.balance)}
+                        </div>
+                        <div style="font-size: 0.75rem; color: var(--text-secondary);">
+                            ${customer.balance > 0 ? 'Outstanding' : 'Paid in full'}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('customersList').innerHTML = html || `
+                <div class="empty-state">
+                    <div class="empty-icon">👥</div>
+                    <div>No customers found</div>
+                </div>
+            `;
+        }
+
+        // Render Invoices
+        function renderInvoices() {
+            const html = data.invoices.map(invoice => `
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">${invoice.invoiceNumber}</div>
+                            <div class="card-subtitle">${invoice.customerName}</div>
+                        </div>
+                        <span class="badge ${invoice.status === 'Paid' ? 'success' : 'warning'}">
+                            ${invoice.status}
+                        </span>
+                    </div>
+                    <div class="card-meta">
+                        <span>📅 ${invoice.date}</span>
+                    </div>
+                    <div style="margin-top: 0.75rem; display: flex; justify-content: space-between;">
+                        <div>
+                            <div class="amount">$${formatMoney(invoice.total)}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">Total</div>
+                        </div>
+                        ${invoice.balance > 0 ? `
+                            <div>
+                                <div class="amount negative">$${formatMoney(invoice.balance)}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-secondary);">Due</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('invoicesList').innerHTML = html || `
+                <div class="empty-state">
+                    <div class="empty-icon">📄</div>
+                    <div>No invoices found</div>
+                </div>
+            `;
+        }
+
+        // Render Products
+        function renderProducts() {
+            const html = data.products.map(product => `
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">${product.name}</div>
+                            <div class="card-subtitle">SKU: ${product.sku}</div>
+                        </div>
+                        ${product.isService ? 
+                            '<span class="badge success">Service</span>' : 
+                            '<span class="badge warning">Product</span>'
+                        }
+                    </div>
+                    <div style="margin-top: 0.75rem; display: flex; justify-content: space-between;">
+                        <div>
+                            <div class="amount">$${formatMoney(product.price)}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">Price</div>
+                        </div>
+                        ${!product.isService && product.stock !== null ? `
+                            <div>
+                                <div class="amount ${product.stock < (product.reorderLevel || 0) ? 'negative' : 'positive'}">
+                                    ${product.stock}
+                                </div>
+                                <div style="font-size: 0.75rem; color: var(--text-secondary);">In stock</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('productsList').innerHTML = html || `
+                <div class="empty-state">
+                    <div class="empty-icon">📦</div>
+                    <div>No products found</div>
+                </div>
+            `;
+        }
+
+        // Show Section
+        function showSection(section) {
+            currentSection = section;
+
+            // Hide all sections
+            document.querySelectorAll('.section, .stats-grid').forEach(el => {
+                el.classList.add('hidden');
+            });
+
+            // Show selected section
+            if (section === 'dashboard') {
+                document.getElementById('dashboardSection').classList.remove('hidden');
+            } else {
+                document.getElementById(`${section}Section`).classList.remove('hidden');
+            }
+
+            // Update nav
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.section === section);
+            });
+        }
+
+        // Utilities
+        function formatMoney(amount) {
+            return Math.abs(amount).toLocaleString('en-CA', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingState').classList.toggle('hidden', !show);
+        }
+
+        function showError(message) {
+            document.getElementById('errorState').classList.remove('hidden');
+            document.getElementById('errorMessage').textContent = message;
+        }
+
+        function hideError() {
+            document.getElementById('errorState').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
